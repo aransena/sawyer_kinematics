@@ -13,10 +13,15 @@
 #include <moveit/move_group_interface/move_group.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/planning_interface/planning_interface.h>
+#include <eigen_conversions/eigen_msg.h>
+#include <ctime>
+#include <std_msgs/Float64MultiArray.h>
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "sawyer_jacobian");
     ros::NodeHandle n;
+    ros::Publisher jcb_pub = n.advertise<std_msgs::Float64MultiArray>("sawyer_jacobian", 1000);
+
     ros::AsyncSpinner spinner(1);
     spinner.start();
 
@@ -31,13 +36,21 @@ int main(int argc, char **argv) {
 
     Eigen::Vector3d reference_point_position(0.0,0.0,0.0);
     Eigen::MatrixXd jacobian;
+    std_msgs::Float64MultiArray jacobian_msg;
 
-    ros::Rate rate(50);
+    ros::Rate rate(100);
     while (n.ok()) {
         current_state = move_group.getCurrentState();
         jacobian = current_state->getJacobian(joint_model_group, reference_point_position);
-        ROS_INFO_STREAM("Jacobian: \n" << jacobian);
+
+        tf::matrixEigenToMsg(jacobian, jacobian_msg);
+
+        jcb_pub.publish(jacobian_msg);
+
+//        ROS_INFO_STREAM("Jacobian: \n" << jacobian_msg);
+
         rate.sleep();
+
     }
 
 //    const std::vector<std::string> &joint_names = joint_model_group->getActiveJointModelNames();
