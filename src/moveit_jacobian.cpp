@@ -5,17 +5,16 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Pose.h>
 
-// MoveIt!
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/robot_state/robot_state.h>
 #include <moveit/robot_state/conversions.h>
 
-#include <moveit/move_group_interface/move_group.h>
+#include <moveit/move_group_interface/move_group_interface.h>
+//#include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/planning_interface/planning_interface.h>
 #include <eigen_conversions/eigen_msg.h>
-#include <ctime>
-#include <std_msgs/Float64MultiArray.h>
+
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "sawyer_jacobian");
@@ -26,6 +25,7 @@ int main(int argc, char **argv) {
     spinner.start();
 
     static const std::string PLANNING_GROUP = "right_arm";
+    moveit::
     move_group_interface::MoveGroup move_group(PLANNING_GROUP);
 
     const robot_state::JointModelGroup *joint_model_group = move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
