@@ -37,30 +37,31 @@ def fk_service_client(limb = "right"):
     joints = JointState()
 
     angles = _limb.joint_angles()
-    joints.name = ['right_j0', 'right_j1', 'right_j2', 'right_j3',
-                   'right_j4', 'right_j5', 'right_j6']
-    joints.position=[]
-    for n in joints.name:
-        joints.position.append(angles[n])
+    if len(angles) is 7:
+        joints.name = ['right_j0', 'right_j1', 'right_j2', 'right_j3',
+                       'right_j4', 'right_j5', 'right_j6']
+        joints.position=[]
+        for n in joints.name:
+            joints.position.append(angles[n])
 
-    # Add desired pose for forward kinematics
-    fkreq.configuration.append(joints)
-    # Request forward kinematics from base to "right_hand" link
-    fkreq.tip_names.append('right_hand')
+        # Add desired pose for forward kinematics
+        fkreq.configuration.append(joints)
+        # Request forward kinematics from base to "right_hand" link
+        fkreq.tip_names.append('right_hand')
 
-    try:
-        rospy.wait_for_service(ns, 5.0)
-        resp = fksvc(fkreq)
-    except (rospy.ServiceException, rospy.ROSException), e:
-        rospy.logerr("Service call failed: %s" % (e,))
-        return False
+        try:
+            rospy.wait_for_service(ns, 5.0)
+            resp = fksvc(fkreq)
+        except (rospy.ServiceException, rospy.ROSException), e:
+            rospy.logerr("Service call failed: %s" % (e,))
+            return False
 
-    # Check if result valid
-    if (resp.isValid[0]):
-        return resp
-    else:
-        rospy.logerr("INVALID JOINTS - No Cartesian Solution Found.")
-        return False
+        # Check if result valid
+        if (resp.isValid[0]):
+            return resp
+        else:
+            rospy.logerr("INVALID JOINTS - No Cartesian Solution Found.")
+            return False
 
 
 

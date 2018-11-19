@@ -186,8 +186,8 @@ include_directories(
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-add_executable(moveit_jacobian src/moveit_jacobian.cpp)
-target_link_libraries(moveit_jacobian ${catkin_LIBRARIES})
+#add_executable(moveit_jacobian src/moveit_jacobian.cpp)
+#target_link_libraries(moveit_jacobian ${catkin_LIBRARIES})
 
 #############
 ## Testing ##
