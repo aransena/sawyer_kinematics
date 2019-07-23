@@ -28,41 +28,48 @@ import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
 
-def fk_service_client(limb = "right"):
-    _limb = intera_interface.Limb(limb)
-    ns = "ExternalTools/" + limb + "/PositionKinematicsNode/FKService"
-    fksvc = rospy.ServiceProxy(ns, SolvePositionFK)
-    fkreq = SolvePositionFKRequest()
+class fk_service_client():
 
-    joints = JointState()
-
-    angles = _limb.joint_angles()
-    if len(angles) is 7:
-        joints.name = ['right_j0', 'right_j1', 'right_j2', 'right_j3',
-                       'right_j4', 'right_j5', 'right_j6']
-        joints.position=[]
-        for n in joints.name:
-            joints.position.append(angles[n])
-
-        # Add desired pose for forward kinematics
-        fkreq.configuration.append(joints)
-        # Request forward kinematics from base to "right_hand" link
-        fkreq.tip_names.append('right_hand')
-
+    def __init__(self):
         try:
-            rospy.wait_for_service(ns, 5.0)
-            resp = fksvc(fkreq)
-        except (rospy.ServiceException, rospy.ROSException), e:
-            rospy.logerr("Service call failed: %s" % (e,))
-            return False
+            rospy.init_node("fk_service")
+        except:
+            pass
+        self._limb = intera_interface.Limb("right")
+        ns = "ExternalTools/right/PositionKinematicsNode/FKService"
+        self._fksvc = rospy.ServiceProxy(ns, SolvePositionFK)
+        rospy.wait_for_service(ns, 5.0)
 
-        # Check if result valid
-        if (resp.isValid[0]):
-            return resp
-        else:
-            rospy.logerr("INVALID JOINTS - No Cartesian Solution Found.")
-            return False
+    def request(self, joint_angles):
+        joints = JointState()
+        fkreq = SolvePositionFKRequest()
 
+        if len(joint_angles) is 7:
+            joints.name = ['right_j0', 'right_j1', 'right_j2', 'right_j3',
+                           'right_j4', 'right_j5', 'right_j6']
+
+            joints.position=[]
+            for n in joints.name:
+                # joints.position.append(joint_angles[n])
+                joints.position = joint_angles
+
+            # Add desired pose for forward kinematics
+            fkreq.configuration.append(joints)
+            # Request forward kinematics from base to "right_hand" link
+            fkreq.tip_names.append('right_hand')
+
+            try:
+                resp = self._fksvc(fkreq)
+            except (rospy.ServiceException, rospy.ROSException), e:
+                rospy.logerr("Service call failed: %s" % (e,))
+                return False
+
+            # Check if result valid
+            if (resp.isValid[0]):
+                return resp
+            else:
+                rospy.logerr("INVALID JOINTS - No Cartesian Solution Found.")
+                return False
 
 
 def ik_service_client(input_pose, limb = "right", use_advanced_options = False, seed_position=None, nullspace=False):
@@ -149,7 +156,7 @@ def ik_service_client(input_pose, limb = "right", use_advanced_options = False, 
         rospy.logerr("Result Error %d", resp.result_type[0])
         return False
 
-    return True
+    # return True
 
 if __name__ == '__main__':
     print "============ Starting tutorial setup"
