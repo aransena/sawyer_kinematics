@@ -112,7 +112,8 @@ def ik_service_client(input_pose, limb = "right", use_advanced_options = False, 
                      'right_j4', 'right_j5', 'right_j6']
 
         if seed_position is None:
-            seed.position = [0.7, 0.4, -1.7, 1.4, -1.1, -1.6, -0.4]
+            #seed.position = [0.7, 0.4, -1.7, 1.4, -1.1, -1.6, -0.4]
+            seed.position = [-1.9834052734375, -1.1675673828125, -0.0937275390625, 1.938525390625, -0.0326494140625, 0.81437890625, -1.7584287109375]
         else:
             seed.position = seed_position
         ikreq.seed_angles.append(seed)
@@ -125,11 +126,15 @@ def ik_service_client(input_pose, limb = "right", use_advanced_options = False, 
         # The nullspace goal can either be the full set or subset of joint angles
         goal = JointState()
         goal.name = ['right_j1', 'right_j2', 'right_j3']
-        goal.position = [-1.1816591796875, -0.0020947265625, 2.177681640625]#[0.1, -0.3, 0.5]
+        goal.position = [-1.1816591796875, -0.0020947265625, 2.177681640625]
+
+        # goal.name = ['right_j0', 'right_j1', 'right_j2', 'right_j3',
+        #              'right_j4', 'right_j5', 'right_j6']
+        # goal.position = seed_position#[-1.9834052734375, -1.1675673828125, -0.0937275390625, 1.938525390625, -0.0326494140625, 0.81437890625, -1.7584287109375]
         ikreq.nullspace_goal.append(goal)
         # The gain used to bias toward the nullspace goal. Must be [0.0, 1.0]
         # If empty, the default gain of 0.4 will be used
-        ikreq.nullspace_gain.append(0.4)
+        ikreq.nullspace_gain.append(.4)
     else:
         pass
         # rospy.loginfo("Running Simple IK Service.")
